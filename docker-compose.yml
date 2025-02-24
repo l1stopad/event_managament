@@ -1,18 +1,34 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres_container
+  db:
+    image: postgres:14
+    container_name: event_management_db
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: alex
-      POSTGRES_PASSWORD: 123qweasd
-      POSTGRES_DB: event_db
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: event_management_web
+    command: >
+      sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
