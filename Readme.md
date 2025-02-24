@@ -16,9 +16,6 @@ A **Django REST Framework** (DRF)-based API for managing events. This project al
   - [💾 Database Setup](#-database-setup)
   - [🛠 Running Migrations](#-running-migrations)
   - [🚀 Starting the Development Server](#-starting-the-development-server)
-- [🐳 Docker Setup](#-docker-setup)
-  - [📄 Dockerfile and docker-compose.yml](#-dockerfile-and-docker-composeyml)
-  - [🏗 Running the Project with Docker](#-running-the-project-with-docker)
 - [📝 API Endpoints](#-api-endpoints)
 - [📄 API Documentation](#-api-documentation)
 - [📧 Email Notifications](#-email-notifications)
@@ -42,7 +39,7 @@ A **Django REST Framework** (DRF)-based API for managing events. This project al
 ## 🛠 Tech Stack
 
 - **Backend**: Python 3.10+, Django, Django REST Framework
-- **Database**: PostgreSQL (recommended for production), SQLite (for development)
+- **Database**: PostgreSQL
 - **Containerization**: Docker & Docker Compose
 - **API Documentation**: drf-yasg (Swagger/Redoc)
 - **Email Sending**: SMTP support (e.g., Gmail, SendGrid)
@@ -55,8 +52,8 @@ A **Django REST Framework** (DRF)-based API for managing events. This project al
 - **Python 3.10+**
 - **pip** (Python package manager)
 - **Git**
-- **PostgreSQL** (or SQLite for development)
-- **Docker & Docker Compose** (for containerized deployment)
+- **PostgreSQL**
+- **Docker & Docker Compose**
 
 ---
 
@@ -66,7 +63,7 @@ A **Django REST Framework** (DRF)-based API for managing events. This project al
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/event-management.git
+   git clone https://github.com/l1stopad/event_managament
    cd event-management
    ```
 
@@ -147,87 +144,6 @@ To create a **superuser** (admin):
 python manage.py createsuperuser
 ```
 
----
-
-You're absolutely right! Below is the updated **`README.md`** with a properly documented **`docker-compose.yml`** section. This ensures that the project can be fully containerized with both **Django** and **PostgreSQL** running seamlessly inside **Docker**.
-
----
-
-## 🐳 Docker Setup
-
-### 📄 Dockerfile and docker-compose.yml
-
-#### 🛠 Dockerfile
-Ensure you have this `Dockerfile` in the **root directory** of your project:
-
-```dockerfile
-# Dockerfile
-FROM python:3.10-slim
-
-# Install dependencies for PostgreSQL
-RUN apt-get update && apt-get install -y libpq-dev gcc && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the dependencies file to the container
-COPY requirements.txt /app/
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the project files into the container
-COPY . /app/
-
-# Expose the port Django will run on
-EXPOSE 8000
-
-# Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-```
-
----
-
-#### 📄 `docker-compose.yml`
-Ensure you have this `docker-compose.yml` file in the **root directory**:
-
-```yaml
-version: '3.8'
-
-services:
-  db:
-    image: postgres:14
-    container_name: event_management_db
-    restart: always
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  web:
-    build: .
-    container_name: event_management_web
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    env_file:
-      - .env
-
-volumes:
-  postgres_data:
-```
-
----
 
 ### 🏗 Running the Project with Docker
 
@@ -335,14 +251,6 @@ Once the containers are up and running:
 
 ---
 
-## 📝 Final Notes on Docker
-
-✔ The **`db`** service runs a PostgreSQL container  
-✔ The **`web`** service runs the Django app  
-✔ The **`.env`** file is used for environment variables  
-✔ **Volumes** ensure PostgreSQL data persists across restarts  
-
-Now, your **Event Management API** is **fully containerized** and ready to deploy! 🎉🚀
 
 ## 📝 API Endpoints
 
